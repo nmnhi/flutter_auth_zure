@@ -8,57 +8,63 @@ class AuthPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Azure AD Login"),
-      ),
-      body: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is Authenticated) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Login success"),
-              ),
-            );
-          } else if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-              ),
-            );
-          }
-        },
-        builder: (context, state) {
-          if (state is AuthInitial || state is Unauthenticated) {
-            return Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  context.read<AuthBloc>().add(LoginRequested());
-                },
-                child: const Text("Login with Azure AD"),
-              ),
-            );
-          } else if (state is AuthLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state is Authenticated) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Access token: ${state.accessToken}"),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<AuthBloc>().add(LogoutRequested());
-                    },
-                    child: const Text("Logout"),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            "assets/images/background_image.png",
+            fit: BoxFit.cover,
+          ),
+          BlocConsumer<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state is Authenticated) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Login success"),
                   ),
-                ],
-              ),
-            );
-          }
-          return const Center(child: Text("No data"));
-        },
+                );
+              } else if (state is AuthError) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                  ),
+                );
+              }
+            },
+            builder: (context, state) {
+              if (state is AuthInitial || state is Unauthenticated) {
+                return Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      context.read<AuthBloc>().add(LoginRequested());
+                    },
+                    child: const Text("Login with Azure AD"),
+                  ),
+                );
+              } else if (state is AuthLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is Authenticated) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Access token: ${state.accessToken}"),
+                      ElevatedButton(
+                        onPressed: () {
+                          context.read<AuthBloc>().add(LogoutRequested());
+                        },
+                        child: const Text("Logout"),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return const Center(child: Text("No data"));
+            },
+          ),
+        ],
       ),
     );
   }
